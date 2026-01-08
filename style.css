@@ -1,0 +1,98 @@
+:root {
+    --bg-color: #121212;
+    --card-bg: #1e1e1e;
+    --text-color: #ffffff;
+    --primary: #FF4500; /* Free Fire Orange */
+    --verified-blue: #20D5EC; /* TikTok Blue */
+    --nav-height: 60px;
+}
+
+body {
+    margin: 0;
+    font-family: 'Segoe UI', sans-serif;
+    background-color: var(--bg-color);
+    color: var(--text-color);
+    padding-bottom: var(--nav-height);
+}
+
+/* Auth Screen */
+#auth-container {
+    height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background: linear-gradient(45deg, #000, #2c0e0e);
+}
+.auth-box {
+    text-align: center;
+    width: 300px;
+}
+input {
+    width: 100%;
+    padding: 10px;
+    margin: 5px 0;
+    border-radius: 5px;
+    border: none;
+    background: #333;
+    color: white;
+}
+button {
+    width: 100%;
+    padding: 10px;
+    margin-top: 10px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    font-weight: bold;
+}
+.btn-primary { background: var(--primary); color: white; }
+.btn-secondary { background: #444; color: white; }
+
+/* App Header */
+header {
+    display: flex;
+    justify-content: space-between;
+    padding: 15px;
+    background: var(--card-bg);
+    border-bottom: 1px solid #333;
+    position: sticky;
+    top: 0;
+    z-index: 100;
+}
+.logo { font-size: 1.2rem; font-weight: bold; color: var(--primary); }
+
+/* Feed */
+.create-post { padding: 15px; border-bottom: 1px solid #333; display: flex; gap: 10px; }
+.post {
+    background: var(--card-bg);
+    margin: 10px 0;
+    padding: 15px;
+}
+.post-header { display: flex; align-items: center; gap: 10px; margin-bottom: 10px; }
+.username { font-weight: bold; }
+
+/* The Verified Badge */
+.verified-badge {
+    color: var(--verified-blue);
+    margin-left: 5px;
+    font-size: 0.9em;
+}
+
+/* Bottom Nav */
+.bottom-nav {
+    position: fixed;
+    bottom: 0;
+    width: 100%;
+    height: var(--nav-height);
+    background: var(--card-bg);
+    display: flex;
+    justify-content: space-around;
+    align-items: center;
+    border-top: 1px solid #333;
+}
+.nav-item { font-size: 1.2rem; color: gray; cursor: pointer; }
+.nav-item.active { color: var(--primary); }
+
+/* Pages */
+.page { display: none; padding: 10px; }
+.page.active { display: block; }
