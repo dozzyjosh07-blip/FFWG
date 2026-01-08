@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Free Fire Worldwide Gamers (FFWG)</title>
+    <title>FFWG</title>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
     <link rel="stylesheet" href="style.css">
 </head>
@@ -12,17 +12,14 @@
     <div id="auth-container">
         <div class="auth-box">
             <h1>FFWG 🔥</h1>
-            <p>Connect with Survivors Worldwide</p>
             <input type="email" id="email" placeholder="Email">
             <input type="password" id="password" placeholder="Password">
-            <input type="text" id="username" placeholder="Username (for new signups)">
+            <input type="text" id="username" placeholder="Username">
             <button onclick="signUp()" class="btn-primary">Sign Up</button>
             <button onclick="signIn()" class="btn-secondary">Log In</button>
-            <button onclick="signInWithGoogle()" style="background-color: white; color: black; margin-top: 10px;">
-  <i class="fa-brands fa-google"></i> Sign in with Google
+            <button onclick="signInWithGoogle()" style="background: white; color: black; margin-top: 10px;">
+                <i class="fa-brands fa-google"></i> Sign in with Google
             </button>
-            
-            <p id="auth-msg"></p>
         </div>
     </div>
 
@@ -31,54 +28,63 @@
         <header>
             <div class="logo">FFWG <i class="fa-solid fa-fire"></i></div>
             <div class="actions">
-                <i class="fa-solid fa-moon" onclick="toggleTheme()"></i>
-                <i class="fa-solid fa-right-from-bracket" onclick="logout()"></i>
+                <i class="fa-solid fa-bars" onclick="logout()"></i>
             </div>
         </header>
 
         <main>
             <section id="home-page" class="page active">
                 <div class="create-post">
-                    <input type="text" id="post-text" placeholder="What's your strategy today?">
+                    <input type="text" id="post-text" placeholder="Add a post...">
                     <button onclick="createPost()">Post</button>
                 </div>
-                <div id="feed-container">
-                    <div class="loading">Loading Feed...</div>
-                </div>
+                <div id="feed-container">Loading Feed...</div>
             </section>
 
             <section id="messages-page" class="page">
-                <h2>Messaging Center</h2>
-                <div class="coming-soon">
-                    <p>Real-time chat is coming in update v1.1!</p>
-                </div>
+                <h2>Messages</h2>
+                <p>Coming Soon</p>
             </section>
 
-                            <section id="profile-page" class="page">
+            <section id="profile-page" class="page">
                 <div class="profile-header">
                     <img id="profile-pic" src="" alt="Profile">
-                    <h2 id="profile-name">Loading...</h2>
-                    <p id="profile-bio">Survivor</p>
                     
-                    <div style="display: flex; gap: 10px; justify-content: center; margin-top: 10px;">
-                        <button onclick="editBio()" class="btn-edit">Edit Bio</button>
-                        <button onclick="triggerGallery()" class="btn-edit" style="background:#444;">Change Photo</button>
+                    <h2 id="profile-name">Loading...</h2>
+                    <p id="profile-username">@survivor</p>
+
+                    <div class="profile-stats">
+                        <div class="stat-box"><strong>12</strong><span>Following</span></div>
+                        <div class="stat-box"><strong>480</strong><span>Followers</span></div>
+                        <div class="stat-box"><strong id="total-likes">0</strong><span>Likes</span></div>
                     </div>
+
+                    <div class="profile-actions">
+                        <button onclick="editBio()" class="btn-tiktok">Edit Profile</button>
+                        <button onclick="triggerGallery()" class="btn-tiktok">Change Photo</button>
+                    </div>
+                    
+                    <p id="profile-bio" style="text-align:center; color:white; margin-bottom:20px;">Survivor</p>
+
+                    <div class="profile-tabs">
+                        <div class="tab-item active"><i class="fa-solid fa-table-cells"></i></div>
+                        <div class="tab-item"><i class="fa-solid fa-heart"></i></div>
+                        <div class="tab-item"><i class="fa-solid fa-lock"></i></div>
+                    </div>
+
+                    <div id="my-posts-grid" class="tiktok-grid">
+                        </div>
 
                     <input type="file" id="file-input" accept="image/*" style="display: none;" onchange="uploadProfilePic(this)">
                 </div>
             </section>
-        
-
-      </main>
+        </main>
 
         <nav class="bottom-nav">
             <div onclick="switchPage('home-page')" class="nav-item active"><i class="fa-solid fa-house"></i></div>
             <div onclick="switchPage('messages-page')" class="nav-item"><i class="fa-solid fa-comment-dots"></i></div>
-            <div onclick="switchPage('notifications-page')" class="nav-item"><i class="fa-solid fa-bell"></i></div>
-            <div onclick="switchPage('profile-page')" class="nav-item"><i class="fa-solid fa-user"></i></div>
+            <div onclick="switchPage('profile-page')" class="nav-item"><i class="fa-regular fa-user"></i></div>
         </nav>
-
     </div>
 
     <script type="module" src="script.js"></script>
