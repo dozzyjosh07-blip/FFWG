@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Free Fire Worldwide Gamers (FFWG)</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+    <div id="auth-container">
+        <div class="auth-box">
+            <h1>FFWG 🔥</h1>
+            <p>Connect with Survivors Worldwide</p>
+            <input type="email" id="email" placeholder="Email">
+            <input type="password" id="password" placeholder="Password">
+            <input type="text" id="username" placeholder="Username (for new signups)">
+            <button onclick="signUp()" class="btn-primary">Sign Up</button>
+            <button onclick="signIn()" class="btn-secondary">Log In</button>
+            <p id="auth-msg"></p>
+        </div>
+    </div>
+
+    <div id="app-container" style="display:none;">
+        
+        <header>
+            <div class="logo">FFWG <i class="fa-solid fa-fire"></i></div>
+            <div class="actions">
+                <i class="fa-solid fa-moon" onclick="toggleTheme()"></i>
+                <i class="fa-solid fa-right-from-bracket" onclick="logout()"></i>
+            </div>
+        </header>
+
+        <main>
+            <section id="home-page" class="page active">
+                <div class="create-post">
+                    <input type="text" id="post-text" placeholder="What's your strategy today?">
+                    <button onclick="createPost()">Post</button>
+                </div>
+                <div id="feed-container">
+                    <div class="loading">Loading Feed...</div>
+                </div>
+            </section>
+
+            <section id="messages-page" class="page">
+                <h2>Messaging Center</h2>
+                <div class="coming-soon">
+                    <p>Real-time chat is coming in update v1.1!</p>
+                </div>
+            </section>
+
+            <section id="profile-page" class="page">
+                <div class="profile-header">
+                    <img id="profile-pic" src="https://via.placeholder.com/100" alt="Profile">
+                    <h2 id="profile-name">Loading...</h2>
+                    <p id="profile-bio">Survivor</p>
+                    <div id="verified-status"></div>
+                </div>
+                <div class="settings-links">
+                    <a href="https://wa.me/2349045743299" class="btn-whatsapp"><i class="fa-brands fa-whatsapp"></i> Contact Support</a>
+                </div>
+            </section>
+        </main>
+
+        <nav class="bottom-nav">
+            <div onclick="switchPage('home-page')" class="nav-item active"><i class="fa-solid fa-house"></i></div>
+            <div onclick="switchPage('messages-page')" class="nav-item"><i class="fa-solid fa-comment-dots"></i></div>
+            <div onclick="switchPage('notifications-page')" class="nav-item"><i class="fa-solid fa-bell"></i></div>
+            <div onclick="switchPage('profile-page')" class="nav-item"><i class="fa-solid fa-user"></i></div>
+        </nav>
+
+    </div>
+
+    <script type="module" src="script.js"></script>
+</body>
+</html>
