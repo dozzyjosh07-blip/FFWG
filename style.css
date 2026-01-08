@@ -1,10 +1,11 @@
 :root {
-    --bg-color: #121212;
-    --card-bg: #1e1e1e;
+    --bg-color: #000000; /* Pure Black like TikTok */
+    --card-bg: #121212;
     --text-color: #ffffff;
     --primary: #FF4500; /* Free Fire Orange */
-    --verified-blue: #20D5EC; /* TikTok Blue */
+    --verified-blue: #20D5EC; 
     --nav-height: 60px;
+    --btn-grey: #2F2F2F; /* TikTok button grey */
 }
 
 body {
@@ -23,76 +24,93 @@ body {
     align-items: center;
     background: linear-gradient(45deg, #000, #2c0e0e);
 }
-.auth-box {
-    text-align: center;
-    width: 300px;
-}
+.auth-box { text-align: center; width: 300px; }
 input {
-    width: 100%;
-    padding: 10px;
-    margin: 5px 0;
-    border-radius: 5px;
-    border: none;
-    background: #333;
-    color: white;
+    width: 90%; padding: 12px; margin: 8px 0;
+    border-radius: 4px; border: none; background: #333; color: white;
 }
 button {
-    width: 100%;
-    padding: 10px;
-    margin-top: 10px;
-    border: none;
-    border-radius: 5px;
-    cursor: pointer;
-    font-weight: bold;
+    width: 100%; padding: 12px; margin-top: 10px;
+    border: none; border-radius: 4px; cursor: pointer; font-weight: bold;
 }
 .btn-primary { background: var(--primary); color: white; }
 .btn-secondary { background: #444; color: white; }
 
-/* App Header */
+/* Header */
 header {
-    display: flex;
-    justify-content: space-between;
-    padding: 15px;
-    background: var(--card-bg);
-    border-bottom: 1px solid #333;
-    position: sticky;
-    top: 0;
-    z-index: 100;
+    display: flex; justify-content: space-between; padding: 15px;
+    background: var(--bg-color); position: sticky; top: 0; z-index: 100;
 }
-.logo { font-size: 1.2rem; font-weight: bold; color: var(--primary); }
+.logo { font-size: 1.2rem; font-weight: bold; color: white; }
 
-/* Feed */
-.create-post { padding: 15px; border-bottom: 1px solid #333; display: flex; gap: 10px; }
-.post {
-    background: var(--card-bg);
-    margin: 10px 0;
-    padding: 15px;
+/* TIKTOK PROFILE STYLE */
+.profile-header { text-align: center; padding-top: 20px; }
+
+#profile-pic { 
+    width: 96px; height: 96px; 
+    border-radius: 50%; 
+    object-fit: cover; 
+    border: 2px solid #000;
 }
+
+#profile-name { font-size: 1.2rem; margin: 5px 0 2px 0; }
+#profile-username { color: gray; font-size: 0.9rem; margin: 0; }
+
+/* Stats Row (Following | Followers | Likes) */
+.profile-stats {
+    display: flex; justify-content: center; gap: 20px;
+    margin: 20px 0; text-align: center;
+}
+.stat-box strong { font-size: 1.1rem; display: block; }
+.stat-box span { color: gray; font-size: 0.8rem; }
+
+/* Action Buttons (Edit Profile) */
+.profile-actions {
+    display: flex; justify-content: center; gap: 8px; margin-bottom: 20px;
+}
+.btn-tiktok {
+    background: var(--btn-grey); color: white;
+    padding: 10px 20px; border-radius: 4px; font-size: 0.9rem;
+    border: none; cursor: pointer;
+}
+
+/* Profile Tabs (Grid icon etc) */
+.profile-tabs {
+    display: flex; justify-content: space-around;
+    border-bottom: 1px solid #333; margin-bottom: 2px;
+}
+.tab-item { padding: 10px; color: gray; cursor: pointer; width: 50%; text-align: center; }
+.tab-item.active { color: white; border-bottom: 2px solid white; }
+
+/* 3-Column Post Grid */
+.tiktok-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr); /* 3 items per row */
+    gap: 2px;
+}
+.grid-post {
+    background: #222;
+    aspect-ratio: 3/4; /* Rectangle shape */
+    display: flex; align-items: center; justify-content: center;
+    position: relative;
+    overflow: hidden;
+}
+.grid-text { font-size: 0.7rem; padding: 5px; text-align: center; }
+
+/* Feed & Nav */
+.create-post { padding: 15px; border-bottom: 1px solid #333; display: flex; gap: 10px; }
+.post { background: #121212; margin-bottom: 10px; padding: 15px; border-bottom: 1px solid #333; }
 .post-header { display: flex; align-items: center; gap: 10px; margin-bottom: 10px; }
 .username { font-weight: bold; }
+.verified-badge { color: var(--verified-blue); margin-left: 5px; }
 
-/* The Verified Badge */
-.verified-badge {
-    color: var(--verified-blue);
-    margin-left: 5px;
-    font-size: 0.9em;
-}
-
-/* Bottom Nav */
 .bottom-nav {
-    position: fixed;
-    bottom: 0;
-    width: 100%;
-    height: var(--nav-height);
-    background: var(--card-bg);
-    display: flex;
-    justify-content: space-around;
-    align-items: center;
-    border-top: 1px solid #333;
+    position: fixed; bottom: 0; width: 100%; height: var(--nav-height);
+    background: black; border-top: 1px solid #333;
+    display: flex; justify-content: space-around; align-items: center;
 }
-.nav-item { font-size: 1.2rem; color: gray; cursor: pointer; }
-.nav-item.active { color: var(--primary); }
+.nav-item { font-size: 1.4rem; color: gray; }
+.nav-item.active { color: white; }
 
-/* Pages */
-.page { display: none; padding: 10px; }
+.page { display: none; }
 .page.active { display: block; }
