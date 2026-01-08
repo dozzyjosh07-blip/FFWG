@@ -54,17 +54,27 @@
                 </div>
             </section>
 
-            <section id="profile-page" class="page">
+                        <section id="profile-page" class="page">
                 <div class="profile-header">
-                    <img id="profile-pic" src="https://via.placeholder.com/100" alt="Profile">
+                    <img id="profile-pic" src="" alt="Profile">
                     <h2 id="profile-name">Loading...</h2>
                     <p id="profile-bio">Survivor</p>
-                    <div id="verified-status"></div>
+                    
+                    <div style="display: flex; gap: 10px; justify-content: center; margin-top: 10px;">
+                        <button onclick="editBio()" class="btn-edit">Edit Bio</button>
+                        <button onclick="triggerGallery()" class="btn-edit" style="background:#444;">Change Photo</button>
+                    </div>
+
+                    <input type="file" id="file-input" accept="image/*" style="display: none;" onchange="uploadProfilePic(this)">
                 </div>
-                <div class="settings-links">
-                    <a href="https://wa.me/2349045743299" class="btn-whatsapp"><i class="fa-brands fa-whatsapp"></i> Contact Support</a>
+
+                <div class="settings-links" style="text-align:center; margin-top:20px;">
+                    <a href="https://wa.me/2349045743299" class="btn-whatsapp" style="color:#25D366; text-decoration:none;">
+                        <i class="fa-brands fa-whatsapp"></i> Contact Support
+                    </a>
                 </div>
             </section>
+
         </main>
 
         <nav class="bottom-nav">
