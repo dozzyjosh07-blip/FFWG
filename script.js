@@ -1,11 +1,12 @@
-// --- script.js ---
+// --- script.js V3 (Gallery Support) ---
 
-// 1. WE USE THESE SPECIAL WEB IMPORTS (Do not change these links)
+// 1. IMPORTS (Now includes Storage)
 import { initializeApp } from "https://www.gstatic.com/firebasejs/9.22.0/firebase-app.js";
 import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, onAuthStateChanged, signOut, updateProfile, GoogleAuthProvider, signInWithPopup } from "https://www.gstatic.com/firebasejs/9.22.0/firebase-auth.js";
-import { getFirestore, collection, addDoc, onSnapshot, query, orderBy, serverTimestamp, setDoc, doc, getDoc, getCountFromServer } from "https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore.js";
+import { getFirestore, collection, addDoc, onSnapshot, query, orderBy, serverTimestamp, setDoc, doc, getDoc, getCountFromServer, updateDoc, increment } from "https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore.js";
+import { getStorage, ref, uploadBytes, getDownloadURL } from "https://www.gstatic.com/firebasejs/9.22.0/firebase-storage.js";
 
-// 2. YOUR SPECIFIC KEYS (I copied these from your screenshot)
+// 2. YOUR CONFIG
 const firebaseConfig = {
   apiKey: "AIzaSyDeSmzZSU9JvENgPoGfJqasYmCJccrg-sk",
   authDomain: "ffwg-bdb48.firebaseapp.com",
@@ -16,142 +17,128 @@ const firebaseConfig = {
   measurementId: "G-5R9MHCT5VK"
 };
 
-// 3. START FIREBASE
+// 3. START APP
 const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
 const db = getFirestore(app);
+const storage = getStorage(app); // Start Storage
 
-// --- GLOBAL VARIABLES ---
 window.currentUserData = null;
 
-// --- AUTH FUNCTIONS (Sign Up, Login, Logout) ---
-
-// Sign Up Logic with "First 10 Verified" check
+// --- AUTH ---
 window.signUp = async () => {
     const email = document.getElementById('email').value;
     const password = document.getElementById('password').value;
     const username = document.getElementById('username').value;
-
-    if (!email || !password || !username) {
-        alert("Please fill in all fields");
-        return;
-    }
+    if (!email || !password || !username) { alert("Please fill all fields"); return; }
 
     try {
-        // Create User in Authentication System
         const userCredential = await createUserWithEmailAndPassword(auth, email, password);
         const user = userCredential.user;
+        
+        const snapshot = await getCountFromServer(collection(db, "users"));
+        const isVerified = snapshot.data().count < 10;
 
-        // Check how many users exist to give the badge
-        const usersColl = collection(db, "users");
-        const snapshot = await getCountFromServer(usersColl);
-        const userCount = snapshot.data().count;
-
-        // If user is within first 10, verify them
-        const isVerified = userCount < 10;
-
-        // Save User Profile to Database
         await setDoc(doc(db, "users", user.uid), {
             username: username,
             email: email,
             bio: "New Survivor",
-            verified: isVerified, 
+            pic: "https://i.ibb.co/5k0409z/profile-user.png",
+            verified: isVerified,
             joinedAt: serverTimestamp()
         });
-
-        // Update Auth Profile name
         await updateProfile(user, { displayName: username });
-
-        alert("Account created! Welcome to FFWG.");
-    } catch (error) {
-        alert("Error: " + error.message);
-    }
+        alert("Welcome Survivor!");
+    } catch (error) { alert("Error: " + error.message); }
 };
 
 window.signIn = async () => {
-    const email = document.getElementById('email').value;
-    const password = document.getElementById('password').value;
     try {
-        await signInWithEmailAndPassword(auth, email, password);
-    } catch (error) {
-        alert("Login failed: " + error.message);
-    }
+        await signInWithEmailAndPassword(auth, document.getElementById('email').value, document.getElementById('password').value);
+    } catch (error) { alert("Login failed: " + error.message); }
+};
+
+window.signInWithGoogle = async () => {
+    try {
+        const result = await signInWithPopup(auth, new GoogleAuthProvider());
+        const user = result.user;
+        const userDocRef = doc(db, "users", user.uid);
+        const userDoc = await getDoc(userDocRef);
+
+        if (!userDoc.exists()) {
+            const snapshot = await getCountFromServer(collection(db, "users"));
+            await setDoc(userDocRef, {
+                username: user.displayName,
+                email: user.email,
+                bio: "New Survivor",
+                pic: user.photoURL, 
+                verified: snapshot.data().count < 10,
+                joinedAt: serverTimestamp()
+            });
+        }
+    } catch (error) { console.error(error); alert("Google Login Error"); }
 };
 
 window.logout = () => signOut(auth);
 
-// --- APP LOGIC (Feed, Page Switching) ---
-
-// Listen for Login State Changes
+// --- APP LOGIC ---
 onAuthStateChanged(auth, async (user) => {
     if (user) {
         document.getElementById('auth-container').style.display = 'none';
         document.getElementById('app-container').style.display = 'block';
         
-        // Fetch user data (badge status, etc)
         const userDoc = await getDoc(doc(db, "users", user.uid));
         if (userDoc.exists()) {
             window.currentUserData = userDoc.data();
-            loadProfile(user);
+            loadProfile();
         }
-        
-        loadFeed(); // Start Real-time Feed
+        loadFeed();
     } else {
         document.getElementById('auth-container').style.display = 'flex';
         document.getElementById('app-container').style.display = 'none';
     }
 });
 
-// --- FEED SYSTEM ---
-
+// --- FEED & LIKES ---
 window.createPost = async () => {
     const text = document.getElementById('post-text').value;
     if (!text) return;
-
     try {
         await addDoc(collection(db, "posts"), {
             text: text,
             uid: auth.currentUser.uid,
-            username: window.currentUserData.username || auth.currentUser.displayName,
-            verified: window.currentUserData.verified, 
+            username: window.currentUserData.username,
+            verified: window.currentUserData.verified,
             timestamp: serverTimestamp(),
             likes: 0
         });
-        document.getElementById('post-text').value = ""; // Clear input
-    } catch (e) {
-        console.error("Error posting:", e);
-        alert("Could not post. Check console for details.");
-    }
+        document.getElementById('post-text').value = "";
+    } catch (e) { alert("Post failed"); }
 };
 
-// Real-time Feed Listener
+window.toggleLike = async (postId) => {
+    const postRef = doc(db, "posts", postId);
+    await updateDoc(postRef, { likes: increment(1) });
+};
+
 function loadFeed() {
     const q = query(collection(db, "posts"), orderBy("timestamp", "desc"));
-    
-    // This updates automatically whenever the database changes
     onSnapshot(q, (snapshot) => {
         const feedContainer = document.getElementById('feed-container');
         feedContainer.innerHTML = ""; 
-        
-        if (snapshot.empty) {
-            feedContainer.innerHTML = "<p style='text-align:center; padding:20px;'>No posts yet. Stay tuned!</p>";
-            return;
-        }
+        if (snapshot.empty) { feedContainer.innerHTML = "<p style='text-align:center;'>No posts yet.</p>"; return; }
 
         snapshot.forEach((doc) => {
             const post = doc.data();
-            
-            // Check if user is verified to show badge
             const badge = post.verified ? `<i class="fa-solid fa-circle-check verified-badge"></i>` : "";
-
             const postHTML = `
                 <div class="post">
                     <div class="post-header">
                         <div class="username">${post.username} ${badge}</div>
                     </div>
                     <div class="post-content">${post.text}</div>
-                    <div class="post-actions" style="margin-top:10px; color:gray;">
-                        <i class="fa-regular fa-heart"></i> Like
+                    <div class="post-actions" style="margin-top:10px; color:gray; cursor:pointer;" onclick="toggleLike('${doc.id}')">
+                        <i class="fa-regular fa-heart"></i> ${post.likes || 0} Likes
                     </div>
                 </div>
             `;
@@ -160,62 +147,67 @@ function loadFeed() {
     });
 }
 
-// --- UI HELPERS ---
+// --- PROFILE & GALLERY LOGIC ---
 
-function loadProfile(user) {
-    document.getElementById('profile-name').innerText = window.currentUserData.username;
-    // Show badge on profile if verified
-    if (window.currentUserData.verified) {
-        const badgeIcon = document.createElement('i');
-        badgeIcon.className = "fa-solid fa-circle-check verified-badge";
-        document.getElementById('profile-name').appendChild(badgeIcon);
+window.toggleTheme = () => { document.body.classList.toggle("light-mode"); };
+
+window.editBio = async () => {
+    const newBio = prompt("Enter new bio:", window.currentUserData.bio);
+    if (newBio) {
+        await updateDoc(doc(db, "users", auth.currentUser.uid), { bio: newBio });
+        location.reload();
     }
 }
 
-window.switchPage = (pageId) => {
-    // Hide all pages
-    document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
-    document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
-    
-    // Show selected
-    document.getElementById(pageId).classList.add('active');
-};
-// --- GOOGLE LOGIN LOGIC ---
-window.signInWithGoogle = async () => {
-    const provider = new GoogleAuthProvider();
+// 1. Click the button -> Open Phone Gallery
+window.triggerGallery = () => {
+    document.getElementById('file-input').click();
+}
+
+// 2. When user picks a photo -> Upload to Firebase Storage
+window.uploadProfilePic = async (input) => {
+    const file = input.files[0];
+    if (!file) return;
+
+    // Show loading state
+    alert("Uploading photo... please wait.");
+
     try {
-        const result = await signInWithPopup(auth, provider);
-        const user = result.user;
+        // Create a reference (Name of the file in the cloud)
+        const storageRef = ref(storage, 'profile_pics/' + auth.currentUser.uid);
+        
+        // Upload the file
+        await uploadBytes(storageRef, file);
+        
+        // Get the internet link (URL) of the uploaded file
+        const downloadURL = await getDownloadURL(storageRef);
 
-        // Check if this user is new or existing
-        const userDocRef = doc(db, "users", user.uid);
-        const userDoc = await getDoc(userDocRef);
+        // Save this link to the user's profile
+        await updateDoc(doc(db, "users", auth.currentUser.uid), {
+            pic: downloadURL
+        });
 
-        if (!userDoc.exists()) {
-            // IT IS A NEW USER! Run the Verified Badge check.
-            const usersColl = collection(db, "users");
-            const snapshot = await getCountFromServer(usersColl);
-            const userCount = snapshot.data().count;
-            
-            // If they are among the first 10, verify them
-            const isVerified = userCount < 10;
+        alert("Photo updated!");
+        location.reload();
 
-            // Save their profile
-            await setDoc(userDocRef, {
-                username: user.displayName, // Uses their Google name
-                email: user.email,
-                bio: "New Survivor",
-                verified: isVerified,
-                joinedAt: serverTimestamp()
-            });
-            
-            alert("Google Sign-In Successful! Welcome.");
-        } else {
-            // OLD USER
-            console.log("Welcome back!");
-        }
     } catch (error) {
         console.error(error);
-        alert("Google Login Failed: " + error.message);
+        alert("Upload failed. Did you enable 'Storage' in Firebase?");
     }
+}
+
+function loadProfile() {
+    document.getElementById('profile-name').innerHTML = window.currentUserData.username;
+    if (window.currentUserData.verified) {
+        document.getElementById('profile-name').innerHTML += ` <i class="fa-solid fa-circle-check verified-badge"></i>`;
+    }
+    document.getElementById('profile-bio').innerText = window.currentUserData.bio;
+    const picUrl = window.currentUserData.pic || "https://i.ibb.co/5k0409z/profile-user.png";
+    document.getElementById('profile-pic').src = picUrl;
+}
+
+window.switchPage = (pageId) => {
+    document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+    document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+    document.getElementById(pageId).classList.add('active');
 };
