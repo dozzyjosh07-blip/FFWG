@@ -1,10 +1,9 @@
-// --- script.js V3 (Gallery Support) ---
+// --- script.js V4 (No Credit Card Version) ---
 
-// 1. IMPORTS (Now includes Storage)
+// 1. IMPORTS (Removed Storage, kept Firestore)
 import { initializeApp } from "https://www.gstatic.com/firebasejs/9.22.0/firebase-app.js";
 import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, onAuthStateChanged, signOut, updateProfile, GoogleAuthProvider, signInWithPopup } from "https://www.gstatic.com/firebasejs/9.22.0/firebase-auth.js";
 import { getFirestore, collection, addDoc, onSnapshot, query, orderBy, serverTimestamp, setDoc, doc, getDoc, getCountFromServer, updateDoc, increment } from "https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore.js";
-import { getStorage, ref, uploadBytes, getDownloadURL } from "https://www.gstatic.com/firebasejs/9.22.0/firebase-storage.js";
 
 // 2. YOUR CONFIG
 const firebaseConfig = {
@@ -21,7 +20,6 @@ const firebaseConfig = {
 const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
 const db = getFirestore(app);
-const storage = getStorage(app); // Start Storage
 
 window.currentUserData = null;
 
@@ -147,7 +145,7 @@ function loadFeed() {
     });
 }
 
-// --- PROFILE & GALLERY LOGIC ---
+// --- PROFILE & NO-CARD IMAGE LOGIC ---
 
 window.toggleTheme = () => { document.body.classList.toggle("light-mode"); };
 
@@ -159,41 +157,49 @@ window.editBio = async () => {
     }
 }
 
-// 1. Click the button -> Open Phone Gallery
 window.triggerGallery = () => {
     document.getElementById('file-input').click();
 }
 
-// 2. When user picks a photo -> Upload to Firebase Storage
-window.uploadProfilePic = async (input) => {
+// THE MAGIC PART: Compress image and save as TEXT
+window.uploadProfilePic = (input) => {
     const file = input.files[0];
     if (!file) return;
 
-    // Show loading state
-    alert("Uploading photo... please wait.");
+    alert("Compressing and saving... wait a moment.");
 
-    try {
-        // Create a reference (Name of the file in the cloud)
-        const storageRef = ref(storage, 'profile_pics/' + auth.currentUser.uid);
-        
-        // Upload the file
-        await uploadBytes(storageRef, file);
-        
-        // Get the internet link (URL) of the uploaded file
-        const downloadURL = await getDownloadURL(storageRef);
+    const reader = new FileReader();
+    reader.readAsDataURL(file);
+    reader.onload = (event) => {
+        const img = new Image();
+        img.src = event.target.result;
+        img.onload = async () => {
+            // Create a canvas to shrink the image
+            const canvas = document.createElement('canvas');
+            const MAX_WIDTH = 300; // Small size for profile pic
+            const scaleSize = MAX_WIDTH / img.width;
+            canvas.width = MAX_WIDTH;
+            canvas.height = img.height * scaleSize;
 
-        // Save this link to the user's profile
-        await updateDoc(doc(db, "users", auth.currentUser.uid), {
-            pic: downloadURL
-        });
+            const ctx = canvas.getContext("2d");
+            ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
 
-        alert("Photo updated!");
-        location.reload();
+            // Convert to text string
+            const dataUrl = canvas.toDataURL("image/jpeg", 0.7);
 
-    } catch (error) {
-        console.error(error);
-        alert("Upload failed. Did you enable 'Storage' in Firebase?");
-    }
+            // Save to Database
+            try {
+                await updateDoc(doc(db, "users", auth.currentUser.uid), {
+                    pic: dataUrl
+                });
+                alert("Profile Updated!");
+                location.reload();
+            } catch (error) {
+                console.error(error);
+                alert("Image too big even after compression. Try a smaller one.");
+            }
+        };
+    };
 }
 
 function loadProfile() {
@@ -211,3 +217,4 @@ window.switchPage = (pageId) => {
     document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
     document.getElementById(pageId).classList.add('active');
 };
+
