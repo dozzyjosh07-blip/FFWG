@@ -2,89 +2,186 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>FFWG</title>
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>F.F.W.G</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
 
     <div id="auth-container">
-        <div class="auth-box">
-            <h1>FFWG 🔥</h1>
-            <input type="email" id="email" placeholder="Email">
-            <input type="password" id="password" placeholder="Password">
-            <input type="text" id="username" placeholder="Username">
-            <button onclick="signUp()" class="btn-primary">Sign Up</button>
-            <button onclick="signIn()" class="btn-secondary">Log In</button>
-            <button onclick="signInWithGoogle()" style="background: white; color: black; margin-top: 10px;">
-                <i class="fa-brands fa-google"></i> Sign in with Google
+        
+        <div id="auth-landing" class="auth-box">
+            <h1>F.F.W.G 🌍</h1>
+            <p>Connect with the World.</p>
+            <button onclick="showPage('auth-login')" class="btn btn-primary">Log In</button>
+            <button onclick="showPage('auth-signup-step1')" class="btn btn-secondary">Sign Up</button>
+            <div style="margin:15px 0;">OR</div>
+            <button onclick="signInWithGoogle()" class="btn btn-google">
+                <i class="fa-brands fa-google"></i> Continue with Google
             </button>
+        </div>
+
+        <div id="auth-signup-step1" class="auth-box hidden">
+            <h2>Create Account</h2>
+            <input type="text" id="signup-name" placeholder="Full Name">
+            <input type="text" id="signup-username" placeholder="@Username">
+            <select id="signup-gender">
+                <option value="">Select Gender</option>
+                <option value="male">Male ♂️</option>
+                <option value="female">Female ♀️</option>
+            </select>
+            <select id="signup-country">
+                <option value="">Select Country</option>
+                <option value="🇳🇬 Nigeria">🇳🇬 Nigeria</option>
+                <option value="🇺🇸 USA">🇺🇸 USA</option>
+                <option value="🇬🇧 UK">🇬🇧 UK</option>
+                <option value="🇮🇳 India">🇮🇳 India</option>
+                <option value="🇿🇦 South Africa">🇿🇦 South Africa</option>
+            </select>
+            <input type="email" id="signup-email" placeholder="Email Address">
+            <button onclick="sendVerification()" class="btn btn-primary">Next</button>
+            <button onclick="showPage('auth-landing')" class="btn btn-secondary">Back</button>
+        </div>
+
+        <div id="auth-signup-step2" class="auth-box hidden">
+            <h2>Verify Email</h2>
+            <p>Enter the code sent to your email.</p>
+            <input type="number" id="verify-code" placeholder="123456">
+            <button onclick="checkVerification()" class="btn btn-primary">Verify</button>
+        </div>
+
+        <div id="auth-signup-step3" class="auth-box hidden">
+            <h2>Secure Account</h2>
+            <input type="password" id="signup-pass" placeholder="Create Password">
+            <button onclick="completeSignUp()" class="btn btn-primary">Finish Sign Up</button>
+        </div>
+
+        <div id="auth-login" class="auth-box hidden">
+            <h2>Welcome Back</h2>
+            <input type="email" id="login-email" placeholder="Email">
+            <input type="password" id="login-pass" placeholder="Password">
+            <button onclick="login()" class="btn btn-primary">Log In</button>
+            <button onclick="showPage('auth-landing')" class="btn btn-secondary">Back</button>
         </div>
     </div>
 
-    <div id="app-container" style="display:none;">
+    <div id="app-container" class="hidden">
         
-        <header>
-            <div class="logo">FFWG <i class="fa-solid fa-fire"></i></div>
-            <div class="actions">
-                <i class="fa-solid fa-bars" onclick="logout()"></i>
+        <header id="main-header">
+            <div class="logo">F.F.W.G</div>
+            <div class="header-icons">
+                <div style="position:relative; display:inline-block;">
+                    <i class="fa-solid fa-bell" onclick="showPage('notifications-page')" style="font-size:1.2rem;"></i>
+                    <div id="badge-bell" class="nav-badge">0</div>
+                </div>
             </div>
         </header>
 
-        <main>
-            <section id="home-page" class="page active">
-                <div class="create-post">
-                    <input type="text" id="post-text" placeholder="Add a post...">
-                    <button onclick="createPost()">Post</button>
-                </div>
-                <div id="feed-container">Loading Feed...</div>
-            </section>
-
-            <section id="messages-page" class="page">
-                <h2>Messages</h2>
-                <p>Coming Soon</p>
-            </section>
-
-            <section id="profile-page" class="page">
-                <div class="profile-header">
-                    <img id="profile-pic" src="" alt="Profile">
-                    
-                    <h2 id="profile-name">Loading...</h2>
-                    <p id="profile-username">@survivor</p>
-
-                    <div class="profile-stats">
-                        <div class="stat-box"><strong>12</strong><span>Following</span></div>
-                        <div class="stat-box"><strong>480</strong><span>Followers</span></div>
-                        <div class="stat-box"><strong id="total-likes">0</strong><span>Likes</span></div>
-                    </div>
-
-                    <div class="profile-actions">
-                        <button onclick="editBio()" class="btn-tiktok">Edit Profile</button>
-                        <button onclick="triggerGallery()" class="btn-tiktok">Change Photo</button>
-                    </div>
-                    
-                    <p id="profile-bio" style="text-align:center; color:white; margin-bottom:20px;">Survivor</p>
-
-                    <div class="profile-tabs">
-                        <div class="tab-item active"><i class="fa-solid fa-table-cells"></i></div>
-                        <div class="tab-item"><i class="fa-solid fa-heart"></i></div>
-                        <div class="tab-item"><i class="fa-solid fa-lock"></i></div>
-                    </div>
-
-                    <div id="my-posts-grid" class="tiktok-grid">
-                        </div>
-
-                    <input type="file" id="file-input" accept="image/*" style="display: none;" onchange="uploadProfilePic(this)">
+        <main id="main-content">
+            
+            <section id="home-page" class="page">
+                <div id="feed-list" style="padding-bottom: 60px;">
+                    <div class="loader"></div>
                 </div>
             </section>
+
+            <section id="friends-page" class="page hidden">
+                <div style="padding:15px; border-bottom:1px solid #333; display:flex; justify-content:space-between;">
+                    <button onclick="toggleFriendView('list')" class="btn-secondary" style="width:48%">My Friends</button>
+                    <button onclick="toggleFriendView('add')" class="btn-secondary" style="width:48%">Add New</button>
+                </div>
+                <div id="friends-container" style="padding:10px;"></div>
+            </section>
+
+            <section id="world-chat-page" class="page hidden">
+                <div style="text-align:center; padding:10px; font-weight:bold; border-bottom:1px solid #333;">WORLD CHAT</div>
+                <div id="world-chat-box" class="chat-container"></div>
+                <div class="chat-input-area">
+                    <input type="text" id="world-chat-input" placeholder="Say something..." style="flex:1; padding:10px; border-radius:20px; border:none;">
+                    <button onclick="sendWorldMessage()" class="btn-primary" style="width:50px; border-radius:50%; margin:0;"><i class="fa-solid fa-paper-plane"></i></button>
+                </div>
+            </section>
+
+            <section id="messages-page" class="page hidden">
+                <div style="padding:10px; display:flex; justify-content:space-between; border-bottom:1px solid #333;">
+                    <span style="font-weight:bold;">MESSAGES</span>
+                    <i class="fa-solid fa-user-plus" onclick="alert('Message Requests coming soon')"></i>
+                </div>
+                <div id="messages-list" style="padding:10px;"></div>
+            </section>
+
+            <section id="notifications-page" class="page hidden">
+                <h3 style="padding:15px;">Notifications</h3>
+                <div id="notif-list"></div>
+            </section>
+
         </main>
 
+        <section id="profile-page" class="hidden">
+            <div class="profile-top">
+                <i class="fa-solid fa-chevron-left" onclick="closeProfile()"></i>
+                <span id="profile-top-name">Username</span>
+                <i class="fa-solid fa-bars" onclick="toggleSettings(true)"></i>
+            </div>
+            
+            <div class="profile-info">
+                <div style="position:relative; display:inline-block;" onclick="triggerGallery()">
+                    <img id="profile-pic" src="" class="profile-pic-large">
+                    <div style="position:absolute; bottom:0; right:0; background:#20D5EC; color:black; border-radius:50%; width:25px; height:25px; display:flex; align-items:center; justify-content:center; font-weight:bold;">+</div>
+                </div>
+                
+                <h2 id="profile-display-name" style="margin:10px 0 5px 0;">Loading...</h2>
+                <div id="profile-username" style="color:gray;">@loading</div>
+
+                <div class="stats-row">
+                    <div class="stat-box"><span class="stat-num" id="stat-following">0</span><span class="stat-label">Following</span></div>
+                    <div class="stat-box"><span class="stat-num" id="stat-followers">0</span><span class="stat-label">Followers</span></div>
+                    <div class="stat-box"><span class="stat-num" id="stat-likes">0</span><span class="stat-label">Likes</span></div>
+                </div>
+
+                <div style="display:flex; gap:10px; justify-content:center; padding:0 20px;">
+                    <button class="btn-secondary" style="width:45%;" onclick="editProfile()">Edit Profile</button>
+                    <button class="btn-secondary" style="width:45%;">Share Profile</button>
+                </div>
+
+                <p id="profile-bio" style="margin:15px; color:#c9d1d9;">No bio yet.</p>
+                <a id="wa-link" href="#" target="_blank" style="color:#20D5EC; text-decoration:none; display:none;">
+                    <i class="fa-brands fa-whatsapp"></i> Contact Me
+                </a>
+            </div>
+
+            <div style="display:flex; border-top:1px solid #333; border-bottom:1px solid #333;">
+                <div style="flex:1; text-align:center; padding:15px; border-bottom:2px solid white;"><i class="fa-solid fa-table-cells"></i></div>
+                <div style="flex:1; text-align:center; padding:15px;"><i class="fa-solid fa-heart"></i></div>
+            </div>
+
+            <div id="profile-grid" class="grid-container"></div>
+            
+            <div style="position:fixed; bottom:20px; right:20px; z-index:2005;">
+                <button onclick="createPostPrompt()" style="background:var(--primary); color:white; border:none; width:50px; height:50px; border-radius:50%; font-size:1.5rem; box-shadow:0 4px 10px rgba(0,0,0,0.5);">+</button>
+            </div>
+        </section>
+
         <nav class="bottom-nav">
-            <div onclick="switchPage('home-page')" class="nav-item active"><i class="fa-solid fa-house"></i></div>
-            <div onclick="switchPage('messages-page')" class="nav-item"><i class="fa-solid fa-comment-dots"></i></div>
-            <div onclick="switchPage('profile-page')" class="nav-item"><i class="fa-regular fa-user"></i></div>
+            <div class="nav-item active" onclick="navTo('home-page', this)"><i class="fa-solid fa-house"></i></div>
+            <div class="nav-item" onclick="navTo('friends-page', this)"><i class="fa-solid fa-user-group"></i></div>
+            <div class="nav-item" onclick="navTo('world-chat-page', this)" style="color:var(--text-color); font-size:2rem;"><i class="fa-solid fa-earth-americas"></i> <div id="badge-world" class="nav-badge">0</div></div>
+            <div class="nav-item" onclick="navTo('messages-page', this)"><i class="fa-solid fa-envelope"></i> <div id="badge-msg" class="nav-badge">0</div></div>
+            <div class="nav-item" onclick="openProfile()"><i class="fa-solid fa-user"></i></div>
         </nav>
+
+        <div id="settings-menu" class="side-menu">
+            <h3>Settings & Privacy</h3>
+            <div class="menu-item" onclick="toggleTheme()"><i class="fa-solid fa-moon"></i> Change Theme</div>
+            <div class="menu-item"><i class="fa-solid fa-lock"></i> Privacy Options</div>
+            <div class="menu-item" onclick="window.open('https://wa.me/2349045743299')"><i class="fa-brands fa-whatsapp"></i> Help Center</div>
+            <div class="menu-item" onclick="logout()" style="color:#da3633;"><i class="fa-solid fa-right-from-bracket"></i> Log Out</div>
+            <button onclick="toggleSettings(false)" class="btn-secondary">Close</button>
+        </div>
+
+        <input type="file" id="file-input" accept="image/*" class="hidden" onchange="handleFileUpload(this)">
+
     </div>
 
     <script type="module" src="script.js"></script>
